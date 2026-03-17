@@ -2,6 +2,8 @@ import { pool } from "../../config/db.js";
 import { generatePassword } from "../../Utils/generatePassword.js";
 import bcrypt from "bcrypt";
 
+
+
 const SignupService = async (req, res) => {
   // schools Table => school name, address, logo url,
   // Users Table => email, password, role
@@ -24,10 +26,10 @@ const SignupService = async (req, res) => {
       [email],
     );
     if (emailExists.rows.length != 0) {
+      console.log(emailExists);
       return res.status(400).json({
         message: "Email already exists",
       });
-      console.log(emailExists);
     }
 
     // start transaction
@@ -36,7 +38,8 @@ const SignupService = async (req, res) => {
     // creating school query
     const createSchoolQuery = `
     INSERT INTO schools (name, address, logo_url)
-    VALUES ($1, $2, $3) RETURNING *
+    VALUES ($1, $2, $3)
+    RETURNING *
     `;
     // execute school query
     const schoolResult = await client.query(createSchoolQuery, [

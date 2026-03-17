@@ -2,7 +2,7 @@ import { pool } from "../../config/db.js";
 import bcrypt from "bcrypt";
 import { generateJwtToken } from "../../Utils/generateToken.js";
 
-// first, you check the params of what you want to work on that is what 
+// first, you check the params of what you want to work on that is what
 // the front end will send. and that is email and password in this instance.
 
 const SigninService = async (req, res) => {
