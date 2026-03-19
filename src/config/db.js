@@ -2,11 +2,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import { createStudentTable } from "../model/CreateStudentTable.js";
 import { createUserTable } from "../model/CreateUserTable.js";
-import {
-  alterPrefectTable,
-  alterTables,
-  removeUserTables,
-} from "../model/AlterTables.js";
+
 import { createSchoolTable } from "../model/CreateSchoolTable.js";
 import { createAnnouncementTable } from "../model/CreateAnnoucementTable.js";
 import { createDepartmentTable } from "../model/CreateDepartmentTable.js";
@@ -81,13 +77,6 @@ export const initDb = async () => {
     await client.query(createPrefectTable);
     console.log("prefect table created successfully");
 
-    // ALTER TABLES
-    await client.query(alterTables);
-    console.log("student tables altered successfully");
-
-    await client.query(alterPrefectTable);
-    console.log("prefect tables altered successfully");
-    client.release();
 
     // // DROP STUDENT TABLE COLUMN
     // await client.query(removeUserTables);

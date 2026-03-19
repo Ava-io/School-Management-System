@@ -3,41 +3,48 @@ import { pool } from "../../config/db.js";
 // Create subject
 export const createSubjectService = async (req, res) => {
   try {
-    const { name, CODE, status, dept_id } = req.body;
+    // 1. verify required fields
+    const { name, code, dept_id } = req.body;
     const schoolId = req.user.schoolId;
 
-    if (!name || !CODE || !status || !dept_id) {
+    if (!name || !code || !dept_id) {
       res.status(400).json({
         message: "All fields are required",
       });
     }
 
-    // 2. Check if subject exists
+    // a. Check if subject exists
     const subExists = await pool.query(
       "SELECT * FROM subjects WHERE name = $1",
       [name],
     );
-
+    console.log("check if subject exist", subExists);
     if (subExists.rows.length > 0) {
       return res.status(400).json({
         message: "Subject already exists",
       });
     }
-    console.log(subExists);
 
-    // 3. Create subject query
+    // b. Create subject query
 
     const createSubjectQuery = `
-        INSERT INTO subjects(name)
-        VALUES ($1)
+        INSERT INTO subjects(name, code, dept_id)
+        VALUES ($1, $2, $3)
         RETURNING *
         `;
 
-    // 4. execute subject query
+    // c. execute subject query
     console.log(schoolId, "schID");
     console.log(name);
-    const subResult = await pool.query(createSubjectQuery, [name]);
+    const subResult = await pool.query(createSubjectQuery, [
+      name,
+      code,
+      dept_id,
+    ]);
     console.log(subResult);
+
+    const subject = subResult.rows[0];
+    console.log(subject);
 
     return res.status(201).json({
       message: "Subject created successfully",
@@ -46,13 +53,13 @@ export const createSubjectService = async (req, res) => {
     console.log(error);
 
     return res.status(500).json({
-      message: "Failed to create department",
+      message: "Failed to create subject",
       error: error.message,
     });
   }
 };
 
-// get all subject in a department
+// 2.  get all subject in a department
 export const getSubjects = async (req, res) => {
   try {
     const getSubjects = await pool.query(`SELECT * FROM subjects`);
@@ -61,18 +68,29 @@ export const getSubjects = async (req, res) => {
     return res.status(200).json({
       message: "All subjects gotten successfully",
       data: getSubjects.rows,
+      //  {
+      //   subjects: getSubjects.rows,
+      //   noOfSubjects: getSubjects.rowCount,
+      // }
     });
   } catch (error) {
-    console.log(error);
-    return res.status(200).json({
-      message: "Get subjects failed",
-    });
+    // console.log(error);
+    // return res.status(200).json({
+    //   message: "Get subjects failed",
+    // });
   }
 };
 
-// get subject by id
+// 3. get subject by id
 export const getSubBYId = async (req, res) => {
   try {
+    // const { name, code, dept_id } = req.body;
+    // if (!name || !code || !dept_id) {
+    //   res.status(400).json({
+    //     message: "All fields are required",
+    //   });
+    // }
+
     const id = parseInt(req.params.id);
     const getSubject = await pool.query(
       `
@@ -81,6 +99,17 @@ export const getSubBYId = async (req, res) => {
       [id],
     );
     console.log(getSubject);
+    const idExists = await pool.query("SELECT * FROM subjects WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Subject not found",
+      });
+    }
+
     return res.status(200).json({
       message: "Subject fetched successfully ",
       data: {
@@ -96,19 +125,32 @@ export const getSubBYId = async (req, res) => {
   }
 };
 
-// edit subject by id
+//4.  edit subject by id
 export const editSubById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
+    const { name, code, dept_id } = req.body;
+
+    console.log(id);
+
+
     const editSub = await pool.query(
-      `
-           UPDATE subjects SET name=$1
-           WHERE id=$2
-           RETURNING * 
-            `,
-      [name, id],
+      `UPDATE subjects SET name = COALESCE($1, name), code = COALESCE($2, code), dept_id = COALESCE($3, dept_id) WHERE id = $4 RETURNING *`,
+      [name, code, dept_id, id],
     );
     console.log(editSub);
+
+    const idExists = await pool.query("SELECT * FROM subjects WHERE id = $1", [
+      id,
+    ]);
+    console.log("check if id exists", idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Subject not found",
+      });
+    }
 
     return res.status(200).json({
       message: "Subject edited successfully",
@@ -122,16 +164,34 @@ export const editSubById = async (req, res) => {
   }
 };
 
-// delete subjects by id
+//5.  delete subjects by id
 export const deleteSubjectbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
+    const { name, code, dept_id } = req.body;
+    if (!name || !code || !dept_id) {
+      res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
     const deleteSub = await pool.query(
       `
            DELETE FROM subjects WHERE ID=$1, 
-            `[id],
+            `,[id],
     );
     console.log(deleteSub);
+
+    const idExists = await pool.query("SELECT * FROM subjects WHERE id = $1"
+      [id],);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Subject not found",
+      });
+    }
 
     return res.status(200).json({
       message: "Delete subjects failed",

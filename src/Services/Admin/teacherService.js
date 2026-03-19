@@ -1,6 +1,7 @@
 import { pool } from "../../config/db.js";
 import { generatePassword } from "../../Utils/generatePassword.js";
 import bcrypt from "bcrypt";
+import { errorResponse, successResponse } from "../../Utils/responseHandler.js";
 
 export const createTeacherService = async (req, res) => {
   const client = await pool.connect();
@@ -109,6 +110,7 @@ export const createTeacherService = async (req, res) => {
 export const getTeachersbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
     const getTeacher = await pool.query(
       `
         
@@ -116,6 +118,18 @@ export const getTeachersbyId = async (req, res) => {
       [id],
     );
     console.log(getTeacher);
+
+    const idExists = await pool.query("SELECT * FROM teachers WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Teacher not found",
+      });
+    }
+
     return res.status(200).json({
       message: "teachers fetched successfully",
       data: {
@@ -137,27 +151,45 @@ export const getTeachers = async (req, res) => {
     const getTeachers = await pool.query(` SELECT * FROM teachers`);
     console.log(getTeachers.rows);
 
-    return res.status(200).json({
-      message: "All teachers fetched successfully",
-      data: getTeachers.rows,
-    });
-  } catch (error) {}
+    return successResponse(res, 200, "Teachers fetched successfully");
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, 500, "Fetch teachers successful");
+  }
 };
 
 // edit teacher by id
 export const editTeacherById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const editTeacher = await pool.query(`
-      UPDATE teachers SET first_name = COALESCE($1, first_name), 
+
+    const { first_name, last_name, gender } = req.body;
+    // const schoolId = req.user.schoolId;
+
+    const editTeacher = await pool.query(
+      `
+      UPDATE teachers SET  first_name = COALESCE($1, first_name), 
       last_name = COALESCE($2, last_name), 
-      gender = COALESCE($3, gender) WHERE id = $4 RETURNING *, 
-        `);
+      gender = COALESCE($3, gender) WHERE id = $4 RETURNING *
+        `,
+      [first_name, last_name, gender, id],
+    );
+
+    const idExists = await pool.query("SELECT * FROM teachers WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Teacher not found",
+      });
+    }
 
     console.log(editTeacher);
     return res.status(200).json({
       message: "Teachers edited succesfully",
-      data: editTeacher,
+      data: editTeacher.rows,
     });
   } catch (error) {
     console.log(error);
@@ -174,9 +206,20 @@ export const deleteTeachersbyId = async (req, res) => {
     const deleteTeacher = await pool.query(
       `
         DELETE FROM teachers WHERE id=$1,
-        `,[id]
+        `[id],
     );
     console.log(deleteTeacher);
+
+    const idExists = await pool.query("SELECT * FROM teachers WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Teacher not found",
+      });
+    }
 
     return res.status(200).json({
       message: "Teacher deleted successfully",

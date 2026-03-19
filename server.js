@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { initDb } from "./src/config/db.js";
+// import { initDb } from "./src/config/db.js";
 import teacherRoutes from "./src/routes/Admin/teacher.js";
 
 //  routes
@@ -10,6 +10,7 @@ import deptRoutes from "./src/routes/Admin/department.js";
 import studRoutes from "./src/routes/Admin/student.js";
 import schRoutes from "./src/routes/Admin/school.js";
 import subRoutes from "./src/routes/Admin/subject.js";
+import annRoutes from "./src/routes/Admin/announcement.js";
 
 // this is to initialize dotenv
 dotenv.config();
@@ -27,10 +28,11 @@ app.use("/department", deptRoutes);
 app.use("/student", studRoutes);
 app.use("/school", schRoutes);
 app.use("/subject", subRoutes);
+app.use("/ann", annRoutes);
 
 app.use("/user", userRoutes);
 
 app.listen(port, () => {
   console.log(`My server is running at https://localhost:${port}`);
-  initDb();
+  // initDb();
 });

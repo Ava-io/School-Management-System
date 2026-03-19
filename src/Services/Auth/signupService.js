@@ -11,8 +11,8 @@ const SignupService = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const { schoolName, address, logoUrl, email } = req.body;
     console.log(req.body);
+    const { schoolName, address, logoUrl, email } = req.body;
 
     //creating school
 

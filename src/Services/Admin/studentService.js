@@ -1,4 +1,5 @@
 import { pool } from "../../config/db.js";
+import { generatePassword } from "../../Utils/generatePassword.js";
 import bcrypt from "bcrypt";
 
 // Create Students
@@ -34,7 +35,7 @@ export const createStudentService = async (req, res) => {
     }
     console.log(userExists);
 
-    await client.query("BEGIN");
+    await pool.query("BEGIN");
 
     // 3. Generate Password and hash password
     const password = generatePassword("students");
@@ -55,7 +56,7 @@ export const createStudentService = async (req, res) => {
     // 4. Execute user query
     console.log(schoolId, "schID");
     console.log(email);
-    const userResult = await client.query(createUserQuery, [
+    const userResult = await pool.query(createUserQuery, [
       schoolId,
       email,
       hashedPassword,
@@ -75,21 +76,20 @@ export const createStudentService = async (req, res) => {
     // 5b. execute teacher query
     console.log(user.id, "userID");
     console.log(email);
-    const studResult = await client.query(createStudentQuery, [
+    const studResult = await pool.query(createStudentQuery, [
       user.id,
       first_name,
       last_name,
+      gender,
       state_of_origin,
       age,
-      gender,
     ]);
     console.log(studResult);
     const student = studResult.rows[0];
-    console.log(teacher);
 
     // commit transaction
-    await client.query("COMMIT");
-    res.status(201).jsonn({
+    await pool.query("COMMIT");
+    res.status(201).json({
       message: "Student created successfully",
       data: {
         first_name: student.first_name,
@@ -101,7 +101,7 @@ export const createStudentService = async (req, res) => {
       },
     });
   } catch (error) {
-    await client.query("ROLLBACK");
+    await pool.query("ROLLBACK");
     console.log(error);
 
     return res.status(500).json({
@@ -117,11 +117,23 @@ export const getStudentbyId = async (req, res) => {
     const id = parseInt(req.params.id);
     const getStudent = await pool.query(
       `
-            SELECT * FROM studentts WHERE id = $1
+            SELECT * FROM students WHERE id = $1
             `,
       [id],
     );
     console.log(getStudent);
+
+    const idExists = await pool.query("SELECT * FROM students WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     return res.status(200).json({
       message: "student fetched successfully",
       data: {
@@ -151,10 +163,27 @@ export const getStudents = async (req, res) => {
 };
 
 // edit students by id
+
 export const editStudentById = async (req, res) => {
   try {
+    const { email, first_name, last_name, state_of_origin, gender, age } =
+      req.body;
+
     const id = parseInt(req.params.id);
-    const editStudent = await pool.query(`
+
+    const idExists = await pool.query("SELECT * FROM students WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const editStudent = await pool.query(
+      `
             UPDATE students SET first_name = COALESCE($1, first_name),
             last_name = COALESCE($2, last_name),
             gender = COALESCE($3, gender), 
@@ -162,11 +191,13 @@ export const editStudentById = async (req, res) => {
             age = COALESCE($5, age)
             WHERE id = $6
             RETURNING *
-            `);
+            `,
+      [first_name, last_name, gender, state_of_origin, age, id],
+    );
     console.log(editStudent);
     return res.status(200).json({
       message: "Students edited successfully",
-      data: editStudent,
+      data: editStudent.rows,
     });
   } catch (error) {
     console.log(error);
@@ -180,13 +211,25 @@ export const editStudentById = async (req, res) => {
 export const deleteStudentbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
+
     const deleteStudent = await pool.query(
-      `
-           DELETE FROM students WHERE id=$1, 
-            `,
-      [id],
+      ` DELETE FROM students WHERE id=$1`,[id],
     );
+
     console.log(deleteStudent);
+    
+    const idExists = await pool.query("SELECT * FROM students WHERE id = $1", [
+      id,
+    ]);
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     return res.status(200).json({
       message: "student deleted successfully",
     });

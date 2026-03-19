@@ -80,6 +80,7 @@ export const getDeptbyId = async (req, res) => {
       [id],
     );
     console.log(getDepartment);
+
     return res.status(200).json({
       message: "Department fetched successfully",
       data: {
@@ -99,6 +100,13 @@ export const getDeptbyId = async (req, res) => {
 export const editDeptbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+    const { name } = req.body;
+    if (!name) {
+      res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
     const editDept = await pool.query(
       `
             UPDATE departments SET name=$1
@@ -109,14 +117,26 @@ export const editDeptbyId = async (req, res) => {
 
     console.log(editDept);
 
+    const idExists = await pool.query(
+      "SELECT * FROM departments WHERE id = $1",
+      [id],
+    );
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     return res.status(200).json({
       message: "Department edited successfully",
-      data: editDept,
+      data: editDept.rows,
     });
   } catch (error) {
     console.log(error);
     return res.status(400).json({
-      message: "Edit teachers failed",
+      message: "Edit department failed",
     });
   }
 };
@@ -125,15 +145,34 @@ export const editDeptbyId = async (req, res) => {
 export const deletedeptbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
     const deletedept = await pool.query(
       `
-            DELETE FROM department WHERE id=$1,
-            `[id],
+            DELETE FROM departments WHERE id=$1
+            `,
+      [id],
     );
-    console.log(deletedept);
+    console.log("dxftgyui", deletedept);
 
+    const idExists = await pool.query(
+      "SELECT * FROM departments WHERE id = $1",
+      [id],
+    );
+    console.log("ID EXIXTA RES", idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    
+    return res.status(200).json({
+      message: "Department deleted successfully",
+    });
+  } catch (error) {
     return res.status(200).json({
       message: "Delete department failed",
     });
-  } catch (error) {}
+  }
 };
