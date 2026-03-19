@@ -98,6 +98,9 @@ export const createStudentService = async (req, res) => {
         state_of_origin: student.state_of_origin,
         gender: student.gender,
         age: student.age,
+
+        student: studResult.rows,
+        noOfStudents: studResult.rowCount,
       },
     });
   } catch (error) {

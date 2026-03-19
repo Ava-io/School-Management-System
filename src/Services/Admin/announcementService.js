@@ -161,22 +161,24 @@ export const delAnnById = async (req, res) => {
     //   });
     // }
 
+     const idExists = await pool.query(
+       "SELECT * FROM announcement WHERE id = $1",
+       [id],
+     );
+     console.log(idExists);
+
+     if (idExists.rows.length === 0) {
+       return res.status(404).json({
+         message: "Announcement not found",
+       });
+     }
+     
     const deleteAnn = await pool.query(
       `DELETE FROM announcement WHERE id=$1`,[id],
     );
     console.log(deleteAnn);
 
-    const idExists = await pool.query(
-      "SELECT * FROM announcement WHERE id = $1",
-      [id],
-    );
-    console.log(idExists);
-
-    if (idExists.rows.length === 0) {
-      return res.status(404).json({
-        message: "Announcement not found",
-      });
-    }
+   
 
     return res.status(200).json({
       message: "Annnouncement deleted successfully",

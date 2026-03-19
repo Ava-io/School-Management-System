@@ -10,7 +10,7 @@ export const createTeacherService = async (req, res) => {
     // TODO
 
     // 1. VERify all needed details
-    const { email, firstName, lastName, gender } = req.body;
+    const { email, first_name, last_name, gender } = req.body;
     const schoolId = req.user.schoolId;
 
     if (!email || !firstName || !lastName || !gender) {
@@ -76,21 +76,21 @@ export const createTeacherService = async (req, res) => {
     console.log(email);
     const teacherResult = await client.query(createTeacherQuery, [
       user.id,
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       gender,
     ]);
     console.log(teacherResult);
     const teacher = teacherResult.rows[0];
-    console.log(teacher);
+    console.log("this is to check error", teacher);
 
     // Commit Transaction
     await client.query("COMMIT");
     res.status(201).json({
       message: "Teacher created successfully ",
       data: {
-        firstName: teacher.first_name,
-        lastName: teacher.last_name,
+        first_name: teacher.first_name,
+        last_name: teacher.last_name,
         email: user.email,
         gender: teacher.gender,
       },
