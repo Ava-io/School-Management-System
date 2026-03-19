@@ -154,7 +154,7 @@ export const getTeachers = async (req, res) => {
     return successResponse(res, 200, "Teachers fetched successfully");
   } catch (error) {
     console.log(error);
-    return errorResponse(res, 500, "Fetch teachers successful");
+    return errorResponse(res, 500, "Fetch teachers failed");
   }
 };
 

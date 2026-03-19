@@ -74,10 +74,10 @@ export const getSubjects = async (req, res) => {
       // }
     });
   } catch (error) {
-    // console.log(error);
-    // return res.status(200).json({
-    //   message: "Get subjects failed",
-    // });
+    console.log(error);
+    return res.status(200).json({
+      message: "Get subjects failed",
+    });
   }
 };
 
