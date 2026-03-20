@@ -13,8 +13,8 @@ export const createTeacherService = async (req, res) => {
     const { email, first_name, last_name, gender } = req.body;
     const schoolId = req.user.schoolId;
 
-    if (!email || !firstName || !lastName || !gender) {
-      res.status(400).json({
+    if (!email || !first_name || !last_name || !gender) {
+      return res.status(400).json({
         message: "All fields are required",
       });
     }
@@ -151,10 +151,15 @@ export const getTeachers = async (req, res) => {
     const getTeachers = await pool.query(` SELECT * FROM teachers`);
     console.log(getTeachers.rows);
 
-    return successResponse(res, 200, "Teachers fetched successfully");
+    return res.status(200).json({
+      message: "Teachers fetched succesfully",
+      data: getTeachers.rows,
+    });
   } catch (error) {
     console.log(error);
-    return errorResponse(res, 500, "Fetch teachers failed");
+    return res.status(400).json({
+      message: "Get teachers failed",
+    });
   }
 };
 

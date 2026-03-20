@@ -178,7 +178,7 @@ export const deleteSubjectbyId = async (req, res) => {
 
     const deleteSub = await pool.query(
       `
-           DELETE FROM subjects WHERE ID=$1, 
+           DELETE FROM subjects WHERE id =$1, 
             `,[id],
     );
     console.log(deleteSub);

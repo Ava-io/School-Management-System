@@ -12,7 +12,8 @@ import schRoutes from "./src/routes/Admin/school.js";
 import subRoutes from "./src/routes/Admin/subject.js";
 import annRoutes from "./src/routes/Admin/announcement.js";
 import assRoutes from "./src/routes/Admin/assignment.js";
-
+import classRoutes from "./src/routes/Admin/class.js";
+import prefectRoutes from "./src/routes/Admin/prefect.js";
 
 // this is to initialize dotenv
 dotenv.config();
@@ -32,6 +33,8 @@ app.use("/school", schRoutes);
 app.use("/subject", subRoutes);
 app.use("/ann", annRoutes);
 app.use("/ass", assRoutes);
+app.use("/class", classRoutes);
+app.use("/prefect", prefectRoutes);
 
 app.use("/user", userRoutes);
 

@@ -33,7 +33,7 @@ export const createAssignmentService = async (req, res) => {
         RETURNING *
         `;
 
-        console.log(createAssQuery);
+    console.log(createAssQuery);
     // 4. execute assignment query
     console.log(schoolId, "schID");
     console.log(title);
@@ -49,9 +49,9 @@ export const createAssignmentService = async (req, res) => {
     const assignment = assResult.rows[0];
     console.log(assignment);
 
-    return res.status(500).json({
-      message: "Failed to create assignment",
-      error: error.message,
+    return res.status(201).json({
+      message: "Assignment created successfully",
+      data: assResult.rows,
     });
   } catch (error) {
     console.log(error);
@@ -61,4 +61,137 @@ export const createAssignmentService = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+// 2. Get all assignments
+
+export const getAssignments = async (req, res) => {
+  try {
+    const getAssignments = await pool.query(`SELECT * FROM assignments`);
+    console.log(getAssignments.rows);
+
+    return res.status(200).json({
+      message: "All assignments gotten successfully",
+      data: getAssignments.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      message: "Get assignments failed",
+    });
+  }
+};
+
+// 3. Get assignment by id
+export const getAssById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    // const { title, content, teacher_id, class_id } = req.body;
+    console.log(id);
+
+    const getAss = await pool.query(
+      `
+        SELECT * FROM assignments WHERE id = $1
+        `,
+      [id],
+    );
+    console.log(getAss);
+
+    const idExist = await pool.query(
+      "SELECT * FROM assignments WHERE id = $1",
+      [id],
+    );
+    console.log("fdsd", idExist);
+
+    if (idExist.rows.length === 0) {
+      return res.status(404).json({
+        message: "Assignment not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Assignment gotten successfully",
+      data: getAss.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: "Edit assignment failed",
+    });
+  }
+};
+
+// 4. Update assignnment by id
+export const editAssById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { title, content, teacher_id, class_id } = req.body;
+    console.log(id);
+
+    const editAss = await pool.query(
+      `UPDATE assignments SET title = COALESCE($1, title), content = COALESCE($2, content), teacher_id = COALESCE($3, teacher_id), class_id = COALESCE($4, class_id) WHERE id = $5 RETURNING *`,
+      [title, content, teacher_id, class_id, id],
+    );
+    console.log(editAss);
+
+    const idExists = await pool.query(
+      "SELECT * FROM assignments WHERE id = $1",
+      [id],
+    );
+
+    console.log(idExists);
+
+    if (idExists.rows.length === 0) {
+      return res.status(404).json({
+        message: "Assignment not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Assignment edited successfully",
+      data: editAss.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: "Edit assignment failed",
+    });
+  }
+};
+
+// 5. Delete assignmennt by id
+
+export const delAssById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { title, content, teacher_id, class_id } = req.body;
+
+    if (!title || !content || !teacher_id || !class_id) {
+      res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const deleteAss = await pool.query(
+      `DELETE FROM assignments WHERE id = $1`,
+      [id],
+    );
+    console.log(deleteAss);
+
+    const idExist = await pool.query(
+      "SELECT * FROM assignments WHERE id = $1", [id],
+    );
+
+    console.log(idExist);
+
+    if (idExist.rows.length === 0) {
+      return res.status(404).json({
+        message: "Assignment not found",
+      });
+    }
+    return res.status(200).json({
+      message: "Delete assignment failed",
+    });
+  } catch (error) {}
 };
