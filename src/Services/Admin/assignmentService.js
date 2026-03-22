@@ -80,7 +80,7 @@ export const getAssignments = async (req, res) => {
       message: "Get assignments failed",
     });
   }
-};
+}; 
 
 // 3. Get assignment by id
 export const getAssById = async (req, res) => {

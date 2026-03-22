@@ -14,6 +14,7 @@ import annRoutes from "./src/routes/Admin/announcement.js";
 import assRoutes from "./src/routes/Admin/assignment.js";
 import classRoutes from "./src/routes/Admin/class.js";
 import prefectRoutes from "./src/routes/Admin/prefect.js";
+import submissionRoutes from "./src/routes/Admin/assignmentSubmission.js";
 
 // this is to initialize dotenv
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/ann", annRoutes);
 app.use("/ass", assRoutes);
 app.use("/class", classRoutes);
 app.use("/prefect", prefectRoutes);
+app.use("/submission", submissionRoutes);
 
 app.use("/user", userRoutes);
 
