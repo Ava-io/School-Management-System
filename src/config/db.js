@@ -11,6 +11,7 @@ import { createSubjectTable } from "../model/CreateSubjectTable.js";
 import { createAssignmentTable } from "../model/CreateAssignmentTable.js";
 import { createTeachersTable } from "../model/CreateTeachersTable.js";
 import { createPrefectTable } from "../model/CreatePrefectTable.js";
+import { createSubmissionTable } from "../model/CreateSubmissionTable.js";
 
 dotenv.config();
 
@@ -72,11 +73,13 @@ export const initDb = async () => {
     console.log("teachers table created successfully");
 
     await client.query(createAssignmentTable);
-    console.log("assignnment table created successfully");
+    console.log("assignments table created successfully");
 
     await client.query(createPrefectTable);
     console.log("prefect table created successfully");
 
+    await client.query(createSubmissionTable);
+    console.log("submission table created successfully");
 
     // // DROP STUDENT TABLE COLUMN
     // await client.query(removeUserTables);

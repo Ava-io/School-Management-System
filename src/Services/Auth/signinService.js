@@ -8,7 +8,7 @@ import { generateJwtToken } from "../../Utils/generateToken.js";
 const SigninService = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(password);
+    console.log(req.body);
 
     //   to check if the inputs have bee filled
     if (!email || !password) {
@@ -21,12 +21,12 @@ const SigninService = async (req, res) => {
       "SELECT * FROM users WHERE email = $1",
       [email],
     );
+    console.log("Check pg response:", userExists);
     if (userExists.rows.length === 0) {
       return res.status(400).json({
         message: "Invalid credentials",
       });
     }
-    console.log("Check pg response:", userExists);
 
     //   to save the responnse from postgres as a variable
     const user = userExists.rows[0];
@@ -35,10 +35,12 @@ const SigninService = async (req, res) => {
     // to check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
 
+    console.table([user.email, user.password, password]);
+
     console.log("Check pg response", userExists);
 
     // bcrypt compare is to compare the users password to the hashed password by bcrypt
-    console.log(isMatch);
+    console.log("is match?", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({
