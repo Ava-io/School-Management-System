@@ -6,7 +6,7 @@ import {
   editTeacherById,
   getTeachers,
   getTeachersbyId,
-} from "../../Services/Admin/teacherService.js";
+} from "../../Services/teacherService.js";
 import { checkRole } from "../../middleware/checkRole.js";
 
 const router = Router();

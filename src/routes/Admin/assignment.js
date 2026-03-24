@@ -3,13 +3,12 @@ import { Router } from "express";
 import { verifyToken } from "../../middleware/verifyToken.js";
 import {
   createAssignmentService,
-  
   delAssById,
-  
   editAssById,
   getAssById,
   getAssignments,
-} from "../../Services/Admin/assignmentService.js";
+} from "../../Services/assignmentService.js";
+import { upload } from "../../middleware/upload.js";
 
 const router = Router();
 
@@ -17,6 +16,7 @@ router.post(
   "/create-ass",
   verifyToken,
   checkRole(["teacher", "admin"]),
+  upload.single("file"),
   createAssignmentService,
 );
 router.get(
@@ -41,7 +41,7 @@ router.delete(
   "/delAssById/:id",
   verifyToken,
   checkRole(["admin", "teacher"]),
-  delAssById
+  delAssById,
 );
 
 export default router;

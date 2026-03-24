@@ -1,5 +1,5 @@
-import { pool } from "../../config/db.js";
-import { errorResponse, successResponse } from "../../Utils/responseHandler.js";
+import { pool } from "../config/db.js";
+import { errorResponse, successResponse } from "../Utils/responseHandler.js";
 
 // 1. Create new school
 export const createSchool = async (req, res) => {
@@ -126,7 +126,6 @@ export const editSchbyId = async (req, res) => {
     const id = parseInt(req.params.id);
     const { name, logo_url, address } = req.body;
 
-
     const editSch = await pool.query(
       `
             UPDATE schools SET name = COALESCE ($1, name), logo_url = COALESCE ($2, logo_url), 
@@ -165,13 +164,10 @@ export const editSchbyId = async (req, res) => {
 export const deleteSchbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const deleteSch = await pool.query(
-      `DELETE FROM schools WHERE id=$1 `,[id],
-    );
+    const deleteSch = await pool.query(`DELETE FROM schools WHERE id=$1 `, [
+      id,
+    ]);
     console.log(deleteSch);
-
-
-    
 
     const idExists = await pool.query("SELECT * FROM schools WHERE id = $1", [
       id,
@@ -188,10 +184,9 @@ export const deleteSchbyId = async (req, res) => {
       message: "Delete school successful",
     });
   } catch (error) {
-    console.log(error); 
-      return res.status(400).json({
-        message: "Delete school failed",
-      });
-    }
+    console.log(error);
+    return res.status(400).json({
+      message: "Delete school failed",
+    });
   }
-
+};

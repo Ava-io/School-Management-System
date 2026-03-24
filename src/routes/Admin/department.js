@@ -6,7 +6,7 @@ import {
   editDeptbyId,
   getDepartments,
   getDeptbyId,
-} from "../../Services/Admin/departmentService.js";
+} from "../../Services/departmentService.js";
 import { checkRole } from "../../middleware/checkRole.js";
 
 const router = Router();

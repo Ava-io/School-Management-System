@@ -1,7 +1,7 @@
-import { pool } from "../../config/db.js";
-import { generatePassword } from "../../Utils/generatePassword.js";
+import { pool } from "../config/db.js";
+import { generatePassword } from "../Utils/generatePassword.js";
 import bcrypt from "bcrypt";
-import { errorResponse, successResponse } from "../../Utils/responseHandler.js";
+// import { errorResponse, successResponse } from "../Utils/responseHandler.js";
 
 export const createTeacherService = async (req, res) => {
   const client = await pool.connect();

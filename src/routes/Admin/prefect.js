@@ -7,7 +7,7 @@ import {
   editPrefectById,
   getPrefectById,
   getPrefects,
-} from "../../Services/Admin/prefectService.js";
+} from "../../Services/prefectService.js";
 
 const router = Router();
 

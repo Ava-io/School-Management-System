@@ -10,7 +10,7 @@ import deptRoutes from "./src/routes/Admin/department.js";
 import studRoutes from "./src/routes/Admin/student.js";
 import schRoutes from "./src/routes/Admin/school.js";
 import subRoutes from "./src/routes/Admin/subject.js";
-import annRoutes from "./src/routes/Admin/announcement.js";
+// import annRoutes from "./src/routes/Admin/announcement.js";
 import assRoutes from "./src/routes/Admin/assignment.js";
 import classRoutes from "./src/routes/Admin/class.js";
 import prefectRoutes from "./src/routes/Admin/prefect.js";
@@ -23,6 +23,7 @@ const port = process.env.PORT;
 
 // Middleware to.         parse JSON bodies
 app.use(express.json());
+// app.use("/", express.static(path))
 
 // routes
 app.use("/auth", authRoutes);
@@ -31,7 +32,7 @@ app.use("/department", deptRoutes);
 app.use("/student", studRoutes);
 app.use("/school", schRoutes);
 app.use("/subject", subRoutes);
-app.use("/ann", annRoutes);
+// app.use("/ann", annRoutes);
 app.use("/ass", assRoutes);
 app.use("/class", classRoutes);
 app.use("/prefect", prefectRoutes);

@@ -1,13 +1,32 @@
-import { pool } from "../../config/db.js";
+import { pool } from "../config/db.js";
+import { errorResponse, successResponse } from "../Utils/responseHandler.js";
 
 // 1. Create assignment
 export const createAssignmentService = async (req, res) => {
   try {
     // Verify needed details
-    const { title, content, teacher_id, class_id } = req.body;
+    const { title, content, class_id, subject_id, due_date } = req.body;
     const schoolId = req.user.schoolId;
+    const teacher_id = req.user.id;
+    console.log(teacher_id)
+    const filePath = req.file ? req.file.path : null;
+    console.log("this is filepath", filePath);
 
-    if (!title || !content || !teacher_id || !class_id) {
+    const idQuery = await pool.query(
+      "SELECT id FROM teachers WHERE user_id = $1",
+      [teacher_id],
+    );
+console.log("this is idQuery",idQuery);
+    const raiseTeacherId = idQuery.rows[0].id; 
+
+
+    if (
+      !title ||
+      !content ||
+      !class_id ||
+      !subject_id ||
+      !due_date
+    ) {
       res.status(400).json({
         message: "All fields are required",
       });
@@ -28,8 +47,8 @@ export const createAssignmentService = async (req, res) => {
 
     // 3. Insert into assignment Tables
     const createAssQuery = `
-        INSERT INTO assignments(title, content, teacher_id, class_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO assignments(title, content, class_id, subject_id, due_date, school_id, teacher_id, filePath)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
         `;
 
@@ -38,28 +57,34 @@ export const createAssignmentService = async (req, res) => {
     console.log(schoolId, "schID");
     console.log(title);
 
-    const assResult = await pool.query(createAssQuery, [
+    const values = [
       title,
       content,
-      teacher_id,
       class_id,
-    ]);
+      subject_id,
+      due_date,
+      schoolId,
+      raiseTeacherId,
+      filePath,
+    ];
+
+    const assResult = await pool.query(createAssQuery, values);
     console.log(assResult);
 
-    const assignment = assResult.rows[0];
-    console.log(assignment);
+    // const assignment = assResult.rows[0];
+    // console.log(assignment);
 
-    return res.status(201).json({
-      message: "Assignment created successfully",
-      data: assResult.rows,
-    });
+    return successResponse(
+      res,
+      201,
+
+      "Assignment created succcessfully",
+      assResult.rows[0],
+    );
   } catch (error) {
     console.log(error);
 
-    return res.status(500).json({
-      message: "Failed to create assignment",
-      error: error.message,
-    });
+    return errorResponse(res, 500, "Assignment not created");
   }
 };
 
@@ -80,7 +105,7 @@ export const getAssignments = async (req, res) => {
       message: "Get assignments failed",
     });
   }
-}; 
+};
 
 // 3. Get assignment by id
 export const getAssById = async (req, res) => {
@@ -180,7 +205,8 @@ export const delAssById = async (req, res) => {
     console.log(deleteAss);
 
     const idExist = await pool.query(
-      "SELECT * FROM assignments WHERE id = $1", [id],
+      "SELECT * FROM assignments WHERE id = $1",
+      [id],
     );
 
     console.log(idExist);

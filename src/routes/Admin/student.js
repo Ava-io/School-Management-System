@@ -6,7 +6,7 @@ import {
   editStudentById,
   getStudentbyId,
   getStudents,
-} from "../../Services/Admin/studentService.js";
+} from "../../Services/studentService.js";
 import { checkRole } from "../../middleware/checkRole.js";
 
 const router = Router();

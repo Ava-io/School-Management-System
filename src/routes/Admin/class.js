@@ -7,7 +7,7 @@ import {
   editClassbyId,
   getClass,
   getClassById,
-} from "../../Services/Admin/classService.js";
+} from "../../Services/classService.js";
 
 const router = Router();
 

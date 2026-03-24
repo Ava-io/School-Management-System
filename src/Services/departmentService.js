@@ -1,4 +1,4 @@
-import { pool } from "../../config/db.js";
+import { pool } from "../config/db.js";
 
 // create Department
 export const createDepartmentService = async (req, res) => {
@@ -166,7 +166,6 @@ export const deletedeptbyId = async (req, res) => {
       });
     }
 
-    
     return res.status(200).json({
       message: "Department deleted successfully",
     });

@@ -1,5 +1,5 @@
-import { pool } from "../../config/db.js";
-import { generatePassword } from "../../Utils/generatePassword.js";
+import { pool } from "../config/db.js";
+import { generatePassword } from "../Utils/generatePassword.js";
 import bcrypt from "bcrypt";
 
 // Create Students
@@ -215,13 +215,13 @@ export const deleteStudentbyId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-
     const deleteStudent = await pool.query(
-      ` DELETE FROM students WHERE id=$1`,[id],
+      ` DELETE FROM students WHERE id=$1`,
+      [id],
     );
 
     console.log(deleteStudent);
-    
+
     const idExists = await pool.query("SELECT * FROM students WHERE id = $1", [
       id,
     ]);

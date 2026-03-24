@@ -1,4 +1,4 @@
-import { pool } from "../../config/db.js";
+import { pool } from "../config/db.js";
 
 // Create subject
 export const createSubjectService = async (req, res) => {
@@ -134,7 +134,6 @@ export const editSubById = async (req, res) => {
 
     console.log(id);
 
-
     const editSub = await pool.query(
       `UPDATE subjects SET name = COALESCE($1, name), code = COALESCE($2, code), dept_id = COALESCE($3, dept_id) WHERE id = $4 RETURNING *`,
       [name, code, dept_id, id],
@@ -179,12 +178,14 @@ export const deleteSubjectbyId = async (req, res) => {
     const deleteSub = await pool.query(
       `
            DELETE FROM subjects WHERE id =$1, 
-            `,[id],
+            `,
+      [id],
     );
     console.log(deleteSub);
 
-    const idExists = await pool.query("SELECT * FROM subjects WHERE id = $1"
-      [id],);
+    const idExists = await pool.query(
+      "SELECT * FROM subjects WHERE id = $1"[id],
+    );
     console.log(idExists);
 
     if (idExists.rows.length === 0) {

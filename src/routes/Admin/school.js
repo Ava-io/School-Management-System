@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../../middleware/verifyToken.js";
-import { createSchool, deleteSchbyId, editSchbyId, getSchById, getSchools } from "../../Services/Admin/schoolService.js";
+import { createSchool, deleteSchbyId, editSchbyId, getSchById, getSchools } from "../../Services/schoolService.js";
 import { checkRole } from "../../middleware/checkRole.js";
 
 const router = Router();

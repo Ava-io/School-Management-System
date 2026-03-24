@@ -6,7 +6,7 @@ import {
   editSubById,
   getSubBYId,
   getSubjects,
-} from "../../Services/Admin/subjectService.js";
+} from "../../Services/subjectService.js";
 import { checkRole } from "../../middleware/checkRole.js";
 
 const router = Router();

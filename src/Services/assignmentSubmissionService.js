@@ -1,29 +1,34 @@
-import { pool } from "../../config/db.js";
+import { pool } from "../config/db.js";
 
 // Create submission
 export const createSubmissionService = async (req, res) => {
   try {
     // Verify needed details
-    const { assignment_id, student_id, status, content, filepath, school_id } =
-      req.body;
+    const { assignment_id, status } = req.body;
+    const schoolId = req.user.schoolId;
+    const userId = req.user.id;
+    console.log(userId);
 
-    if (
-      !assignment_id ||
-      !student_id ||
-      !status ||
-      !content ||
-      !filepath ||
-      !school_id
-    ) {
-      res.status(400).json({
+    const file_path = req.file ? req.file.path : null;
+    console.log("this is filepath", file_path);
+
+    if (!assignment_id || !status) {
+      return res.status(400).json({
         message: "All fields are required",
       });
     }
+    const idQuery = await pool.query(
+      "SELECT id FROM students WHERE user_id = $1",
+      [userId],
+    );
+
+    const StudentId = idQuery.rows[0].id;
 
     const submissionExists = await pool.query(
-      "SELECT * FROM submission WHERE student_id = $2",
-      [student_id],
+      "SELECT * FROM submission WHERE student_id = $1",
+      [StudentId],
     );
+
     if (submissionExists.rows.length > 0) {
       return res.status(400).json({
         message: "Submission already exists ",
@@ -33,22 +38,20 @@ export const createSubmissionService = async (req, res) => {
     console.log(submissionExists);
 
     const createSubmissionQuery = `
-    INSERT INTO submission(assignment_id, student_id, status, content, filepath, school_id)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO submission(assignment_id, student_id, status, filepath, school_id)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *
     `;
 
     console.log(createSubmissionQuery);
 
-    console.log(content);
 
     const submissionResult = await pool.query(createSubmissionQuery, [
       assignment_id,
-      student_id,
+      StudentId,
       status,
-      content,
-      filepath,
-      school_id,
+      file_path,
+      schoolId,
     ]);
 
     console.log(submissionResult);
